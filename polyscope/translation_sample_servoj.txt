@@ -1,0 +1,29 @@
+ Program
+   BeforeStart
+     joints≔get_actual_joint_positions()
+     write_output_boolean_register(0, False )
+     Wait: 0.01
+     popup("Registers reset, run PC code and then click Continue",title="Hi Daniel",blocking= True )
+     mode≔0
+   Robot Program
+     write_output_boolean_register(0, True )
+     sync()
+     Loop mode<3
+       Loop mode≟1
+         MoveJ
+           joints
+         write_output_boolean_register(0, False )
+         sync()
+       Loop mode≟2
+         servoj(joints, 0, 0, 0.002, 0.2, 2000)
+       Loop mode≟3
+         Halt
+     sync()
+   Thread_1
+     tmp≔p[0,0,0,0,0,0]
+     Loop
+       Script: pose_register.script
+       joints≔get_inverse_kin(p[tmp[0],tmp[1],tmp[2],tmp[3],tmp[4],tmp[5]],get_actual_joint_positions())
+       sync()
+       mode≔read_input_integer_register(0)
+       sync()
